@@ -1,0 +1,75 @@
+---
+title: "stl_lead_inequity"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#Load Libraries
+library(tidyverse)
+library(janitor)
+library(dplyr)
+```
+
+```{r}
+stl_lead <- read_csv(here::here("data", "stl_blood_lead.csv"),)
+
+#janitor::clean_names
+
+stl_lead <- stl_lead %>% clean_names() 
+```
+
+
+
+```{r}
+# data exploration
+skimr::skim(stl_lead)
+dim(stl_lead)
+names(stl_lead)
+```
+
+```{r}
+stl_lead_plot <- ggplot(data = stl_lead, aes(x =total_pop , y = pct_elevated)) + 
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Total Population Vs. Elevated (%)",
+       x = "Total Population",
+       y = "Elevated (%)")
+
+stl_lead_plot
+```
+
+```{r}
+# create a new column new_col that contains the value of col_a / col_b
+stl_lead_prop<-stl_lead %>% mutate(stl_lead_prop = (stl_lead$white / stl_lead$total_pop)*100)
+```
+
+
+```{r}
+#create a scatterplot graph of the percentage of children in each census tract with elevated blood lead levels (pctElevated) versus the percent of each census tract identifying as white.
+stl_lead_plot <- ggplot(data = stl_lead_prop, aes(x =pct_elevated , y = stl_lead_prop)) + 
+  geom_point(alpha=0.5, color="red") +
+  theme_minimal() +
+  labs(title = "Percent of Elevated Lead in Blood Vs. White Population",
+       x ="Elevated Lead (%)" ,
+       y = "White Population (%)",
+       caption="Areas with higher percentages of the white population tend to have lower levels of elevated lead in the blood. Conversely, areas with lower percentages of the white population exhibit higher levels of lead in the blood") + theme(plot.caption = element_text(size = 10, hjust = 0.5))
+
+stl_lead_plot
+```
+
+```{r}
+ggsave(here::here("figs", "stl_lead_prop.png"), height = 6, width = 5)
+```
+
+```{r}
+stl_lead_histogram <- ggplot(data = stl_lead_prop, aes(x =pct_elevated))+ 
+  geom_histogram(fill="skyblue",color="black") + labs(x="Percent of Elevated Lead in Blood")
+                             
+stl_lead_histogram
+```
+```{r}
+ggsave(here::here("figs", "stl_lead_histogram.png"), height = 6, width = 5)
+```
+
